@@ -30,6 +30,9 @@ jobs:
       - name: Extract Android project
         run: unzip -q ACELLARZECK-AI-VIDEO-STUDIO-starter.zip -d source
 
+      - name: Apply Java 17 compatibility
+        run: cp app/build.gradle.kts source/app/build.gradle.kts
+
       - name: Build debug APK
         run: gradle -p source :app:assembleDebug
 
