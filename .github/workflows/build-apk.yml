@@ -1,43 +1,47 @@
 name: Build ACELLARZECK AI VIDEO STUDIO APK
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+workflow_dispatch:
+push:
+branches:
+- main
 
 permissions:
-  contents: read
+contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+build:
+name: Build Android APK
+runs-on: ubuntu-latest
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+  - name: Setup Java 17
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '17'
 
-      - name: Extract Android project
-        run: unzip -q ACELLARZECK-AI-VIDEO-STUDIO-starter.zip -d source
+  - name: Setup Gradle
+    uses: gradle/actions/setup-gradle@v4
 
-      - name: Apply Java 17 compatibility
-        run: cp app/build.gradle.kts source/app/build.gradle.kts
+  - name: Check Gradle Wrapper
+    run: |
+      if [ ! -f ./gradlew ]; then
+        echo "ERROR: Gradle wrapper tidak ditemukan!"
+        exit 1
+      fi
+      chmod +x ./gradlew
 
-      - name: Build debug APK
-        run: gradle -p source :app:assembleDebug
+  - name: Build Debug APK
+    run: ./gradlew :app:assembleDebug --stacktrace
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ACELLARZECK-AI-VIDEO-STUDIO-debug
-          path: source/app/build/outputs/apk/debug/app-debug.apk
+  - name: Upload APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: ACELLARZECK-AI-VIDEO-STUDIO-APK
+      path: app/build/outputs/apk/debug/*.apk
+      if-no-files-found: error
+      retention-days: 14
