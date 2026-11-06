@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b18">
+<title>ACELLARZECK AI VIDEO STUDIO</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#080b18;
+ color:#f5f6ff;
+ font-family:Arial,sans-serif;
+}
+header{
+ padding:20px;
+ background:#11172a;
+ border-bottom:1px solid #28324c;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+.logo{font-size:19px;font-weight:bold;color:#55d6ff}
+.logo span{color:#a78bfa}
+button,select{
+ cursor:pointer;
+ border:0;
+ border-radius:10px;
+ padding:12px;
+}
+.lang{background:#28324c;color:white}
+main{max-width:850px;margin:auto;padding:20px}
+h1{font-size:27px;margin-bottom:8px}
+.subtitle{color:#9da9c4;line-height:1.6}
+.panel{
+ background:#11172a;
+ border:1px solid #28324c;
+ border-radius:16px;
+ padding:18px;
+ margin-top:20px;
+}
+.tabs{display:flex;gap:10px}
+.tab{
+ flex:1;
+ background:#202a43;
+ color:#cbd5e1;
+}
+.tab.active{
+ background:#5142b9;
+ color:white;
+}
+label{
+ display:block;
+ margin:18px 0 9px;
+ font-weight:bold;
+}
+textarea,select,input{
+ width:100%;
+ background:#080e20;
+ border:1px solid #34415e;
+ color:white;
+ border-radius:10px;
+ padding:13px;
+ font-size:15px;
+}
+textarea{height:120px;resize:vertical}
+.upload{
+ border:2px dashed #53658a;
+ border-radius:12px;
+ padding:22px;
+ text-align:center;
+ color:#aab8d4;
+ cursor:pointer;
+}
+.upload input{display:none}
+#preview{
+ max-width:100%;
+ max-height:250px;
+ margin-top:15px;
+ border-radius:12px;
+ display:none;
+}
+.generate{
+ width:100%;
+ margin-top:20px;
+ padding:16px;
+ background:linear-gradient(100deg,#6548e8,#168fd7);
+ color:white;
+ font-weight:bold;
+ font-size:16px;
+}
+.generate:disabled{opacity:.5}
+#status{
+ margin-top:15px;
+ color:#70d8ff;
+ line-height:1.5;
+}
+.previewbox{
+ min-height:160px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ text-align:center;
+ color:#8492ae;
+ background:#080e20;
+ border-radius:12px;
+ padding:20px;
+}
+footer{
+ text-align:center;
+ color:#71809c;
+ padding:25px;
+ font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">ACELLARZECK <span>AI STUDIO</span></div>
+ <button class="lang" onclick="changeLanguage()">ID / EN</button>
+</header>
+
+<main>
+ <h1 id="title">Buat Video dengan AI</h1>
+ <p class="subtitle" id="subtitle">
+ Ubah ide dan gambar menjadi konsep video kreatif.
+ </p>
+
+ <section class="panel">
+  <div class="tabs">
+   <button class="tab active" id="textTab"
+    onclick="setMode('text')">Text to Video</button>
+   <button class="tab" id="imageTab"
+    onclick="setMode('image')">Image to Video</button>
+  </div>
+
+  <label id="promptLabel">Deskripsikan video kamu</label>
+  <textarea id="prompt"
+   placeholder="Contoh: Seekor ayam jago lucu berjalan di taman..."></textarea>
+
+  <div id="uploadArea" style="display:none">
+   <label id="uploadLabel">Unggah gambar</label>
+   <label class="upload">
+    <span id="uploadText">📷 Pilih gambar dari HP</span>
+    <input type="file" id="imageInput" accept="image/*">
+   </label>
+   <img id="preview" alt="Pratinjau gambar">
+  </div>
+
+  <label id="durationLabel">Durasi video</label>
+  <select id="duration">
+   <option value="5">5 detik</option>
+   <option value="10">10 detik</option>
+   <option value="15">15 detik</option>
+   <option value="30">30 detik</option>
+  </select>
+
+  <label id="qualityLabel">Kualitas video</label>
+  <select id="quality">
+   <option value="720p">HD 720p</option>
+   <option value="1080p">Full HD 1080p</option>
+  </select>
+
+  <button class="generate" id="generate"
+   onclick="generateVideo()">✨ BUAT VIDEO AI</button>
+
+  <div id="status"></div>
+ </section>
+
+ <section class="panel">
+  <h3 id="previewTitle">Pratinjau Video</h3>
+  <div class="previewbox" id="videoPreview">
+   🎬<br>Hasil video akan ditampilkan di sini.
+  </div>
+ </section>
+</main>
+
+<footer>
+ ACELLARZECK AI VIDEO STUDIO V2<br>
+ Creative Ideas. Unlimited Possibilities.
+</footer>
+
+<script>
+let mode="text";
+let english=false;
+
+function setMode(value){
+ mode=value;
+ document.getElementById("textTab").classList.toggle("active",value==="text");
+ document.getElementById("imageTab").classList.toggle("active",value==="image");
+ document.getElementById("uploadArea").style.display=value==="image"?"block":"none";
+}
+
+document.getElementById("imageInput").addEventListener("change",function(){
+ const file=this.files[0];
+ if(!file)return;
+
+ if(!file.type.startsWith("image/")){
+  alert("Silakan pilih file gambar.");
+  this.value="";
+  return;
+ }
+
+ const reader=new FileReader();
+ reader.onload=function(e){
+  const preview=document.getElementById("preview");
+  preview.src=e.target.result;
+  preview.style.display="block";
+  document.getElementById("uploadText").textContent=file.name;
+ };
+ reader.readAsDataURL(file);
+});
+
+function changeLanguage(){
+ english=!english;
+
+ document.getElementById("title").textContent=english?"Create Videos with AI":"Buat Video dengan AI";
+ document.getElementById("subtitle").textContent=english?"Turn your ideas and images into creative video concepts.":"Ubah ide dan gambar menjadi konsep video kreatif.";
+ document.getElementById("promptLabel").textContent=english?"Describe your video":"Deskripsikan video kamu";
+ document.getElementById("uploadLabel").textContent=english?"Upload image":"Unggah gambar";
+ document.getElementById("uploadText").textContent=english?"📷 Choose image from phone":"📷 Pilih gambar dari HP";
+ document.getElementById("durationLabel").textContent=english?"Video duration":"Durasi video";
+ document.getElementById("qualityLabel").textContent=english?"Video quality":"Kualitas video";
+ document.getElementById("generate").textContent=english?"✨ CREATE AI VIDEO":"✨ BUAT VIDEO AI";
+ document.getElementById("previewTitle").textContent=english?"Video Preview":"Pratinjau Video";
+
+ const duration=document.getElementById("duration");
+ duration.options[0].text=english?"5 seconds":"5 detik";
+ duration.options[1].text=english?"10 seconds":"10 detik";
+ duration.options[2].text=english?"15 seconds":"15 detik";
+ duration.options[3].text=english?"30 seconds":"30 detik";
+}
+
+function generateVideo(){
+ const prompt=document.getElementById("prompt").value.trim();
+
+ if(!prompt){
+  document.getElementById("status").textContent=english?"Please enter a video description first.":"Silakan tulis deskripsi video terlebih dahulu.";
+  return;
+ }
+
+ if(mode==="image"&&!document.getElementById("imageInput").files.length){
+  document.getElementById("status").textContent=english?"Please upload an image first.":"Silakan unggah gambar terlebih dahulu.";
+  return;
+ }
+
+ document.getElementById("status").textContent=english?
+ "Your project details are ready. The AI video generation service has not been connected yet.":
+ "Detail proyek sudah siap. Layanan mesin AI video belum dihubungkan. Tahap berikutnya adalah menghubungkan layanan pembuat video.";
+}
+</script>
+
+</body>
+</html>
